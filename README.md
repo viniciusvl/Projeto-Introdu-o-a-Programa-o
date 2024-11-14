@@ -1,1 +1,5 @@
-Este jogo da forca encontra aleatoriamente palavras guardadas em um arquivo CSV. Este projeto na verdade é um mini projeto "nao-oficial" da cadeira de Introdução a Programação em C.
+Este jogo da forca encontra aleatoriamente palavras guardadas em um arquivo CSV. Há 3 palavras para cada letra do alfabeto, com no máximo 6 sílabas. Total de 78 palavras. O arquivos CSV é dividido da seguinte forma:
+
+NUMERO PARA LETRA,PALAVRA1,PALAVRA2,PALAVRA3
+
+1,abacate,amante,android
