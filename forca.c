@@ -235,7 +235,7 @@ INICIO: //tag para o goto
         copia[i] = '_';
     }
 
-    while(erros <= 7){ //enquanto array copia for diferente de array original 
+    while(erros <= 7){ 
         if (erros == 7){
             ExibeForca(str, &erros);
             sleep(1);
