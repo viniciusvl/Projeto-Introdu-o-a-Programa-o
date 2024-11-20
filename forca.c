@@ -235,8 +235,6 @@ INICIO: //tag para o goto
         copia[i] = '_';
     }
 
-    printf("PALAVRA: %s\n", str);
-
     while(erros <= 7){ //enquanto array copia for diferente de array original 
         if (erros == 7){
             ExibeForca(str, &erros);
