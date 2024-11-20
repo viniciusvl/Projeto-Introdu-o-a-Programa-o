@@ -166,7 +166,7 @@ int ChutaPalavra(char *p){
 
             for (int i = 0; chute[i] != '\0'; i++){ 
                 if (chute[i] != p[i]){              
-                    return 0;                 //foi mal a gambiarra!!! dps ajeito
+                    return 0;                 
                 }
             }
             return 1;
@@ -202,7 +202,7 @@ int main(){
     char str[35], letra;
     FILE *fp;
 
-    printf("\t-----SEJA BEM VIADO AO JOGO DA FORCA-------\n\n");   
+    printf("\t-----SEJA BEM VINDO AO JOGO DA FORCA-------\n\n");   
     printf("NENHUMA PALAVRA POSSUI CARACTERE ESPECIAL! ");
     sleep(2);
     system("cls");
