@@ -11,7 +11,38 @@ void RemoveBarraN(char *p){
     }
 }
 
-char *EncontraPalavra(FILE *fp, int rand1, int rand2){
+void NumerosAleatorios(int *rand1, int *rand2){ //gera os números de referência para encontrar a palavra no CSV
+    srand(time(NULL));
+    *rand1 = rand() % 26 + 1; //numero que gera a letra
+    *rand2 = rand() % 3 + 1;  //numero que gera a palavra
+}
+
+void TranformaEm__(char *copia){
+    int i;
+
+    for (i = 0; copia[i] != '\0'; i++){ //transforma o array em _ _ _ _
+        copia[i] = '_';
+    }
+}
+
+void LeLetra(char *letra){
+    printf("Digite a letra: ");
+    scanf("%c", letra);
+    getchar();
+}
+
+void MenuInicial(){ //exibe menu inicial
+    system("cls");
+    printf("\t-----SEJA BEM VINDO AO JOGO DA FORCA-------\n\n");   
+    printf("NENHUMA PALAVRA POSSUI CARACTERE ESPECIAL! ");
+    sleep(2);
+    system("cls");
+    printf("Pressione ENTER para continuar ");
+    scanf("%*c");
+    system("cls");
+}
+
+char *EncontraPalavra(FILE *fp, int rand1, int rand2){ //encontra palavra no arquivo CSV
     int i;
     char linha[35], *str, *p;
    
@@ -109,7 +140,7 @@ void DesenhaForca(int *erros){
     }
 }
 
-void ExibeForca(char *copia, int *erros){
+void ExibeForca(char *copia, int *erros){ //exibe a palavra junto com a
     int i;
 
     DesenhaForca(erros);
@@ -118,7 +149,7 @@ void ExibeForca(char *copia, int *erros){
         printf("%c ", copia[i]);
     }
     printf("\n");
-    printf("Erros: %d/7\n", *erros);
+    printf("Erros: %d/5\n", *erros);
 }
 
 void ConverteMinusculo(char *p){
@@ -129,7 +160,7 @@ void ConverteMinusculo(char *p){
     }
 }
 
-int ProcuraLetra(char *p, char letra){ 
+int ProcuraLetra(char *p, char letra){ //verifica se há a letra digitada na palavra original
     if (strchr(p, letra) == NULL){
         return 0;
     }else{
@@ -137,48 +168,34 @@ int ProcuraLetra(char *p, char letra){
     }
 }
 
-int ChutaPalavra(char *p){
-    int op;
+int ChutaPalavra(char *str){
     char chute[35];
 
-    CHUTE:
-        printf("\nDeseja chutar a palavra?\n"
-               "1-sim 2-nao: ");
-        scanf("%d", &op);
-        getchar();
-        
-        if (op == 2){
-            puts("");
-            return 2;
-        }
+    printf("\nChute a palavra: ");
+    fgets(chute, 35, stdin);
+    RemoveBarraN(chute);
+    ConverteMinusculo(chute);
 
-        if (op < 1 || op > 2){
-            printf("Valor invalido!\n");
-            goto CHUTE;
-        }
-
-        if (op == 1){
-            printf("Adivinhe a palavra: ");
-            scanf("%35[^\n]", chute);
-            getchar();
-
-            ConverteMinusculo(chute);
-
-            for (int i = 0; chute[i] != '\0'; i++){ 
-                if (chute[i] != p[i]){              
-                    return 0;                 
-                }
-            }
-            return 1;
-        }else{
-            return 0;
-        }
+    if (strcmp(chute, str) == 0){
+        return 1;
+    }else{
+        return 0;
+    }
 }
 
 int EncontraIndice(char *str, char *q, char letra){ //descobre indice da letra encontrada no array original 
     char *p = strchr(q, letra);  
     
     return p - str;  
+}
+
+int EncontraElemento(char *letrasDigitadas, char letra, int tamLetrasDigitadas){
+    for (int i = 0; i < tamLetrasDigitadas; i++){
+        if (letrasDigitadas[i] == letra){
+            return 0;
+        }
+    }
+    return 1;
 }
 
 void ArrumaString(char *copia, char *str, char letra){ //atualiza string cópia quando o usuario acerta letra
@@ -196,111 +213,103 @@ void ArrumaString(char *copia, char *str, char letra){ //atualiza string cópia 
     }
 }
 
+int VerificaSeDigitou(char *letrasDigitadas, char letra, int *posDigitadas, int tamLetrasDigitadas){
+    if (EncontraElemento(letrasDigitadas, letra, tamLetrasDigitadas) == 1) {
+        letrasDigitadas[*posDigitadas] = letra;
+        (*posDigitadas)++;
+        return 0;
+    }else{
+        printf("\nLetra ja digitada!\n");
+        return 1;
+    }
+}
+
 int main(){
-    int rand1, rand2; //para encontrar as palavras aleatorias
-    int i, erros, tamCopia, op, tentativas, acertos;
+    int rand1, rand2, perdeu; 
+    int i, erros, tamCopia, op, acertos, posDigitadas;
     char str[35], letra;
     FILE *fp;
 
-    printf("\t-----SEJA BEM VINDO AO JOGO DA FORCA-------\n\n");   
-    printf("NENHUMA PALAVRA POSSUI CARACTERE ESPECIAL! ");
-    sleep(2);
-    system("cls");
-    printf("Pressione ENTER para continuar ");
-    scanf("%*c");
-    system("cls");
+    MenuInicial();
 
-INICIO: //tag para o goto
-    erros = 0;
-    tentativas = 0;
-    acertos = 0;
-
-    srand(time(NULL));
-    rand1 = rand() % 26 + 1; //numero que gera a letra
-    rand2 = rand() % 3 + 1;  //numero que gera a palavra
-
-    fp = fopen("alfabeto_palavras.csv", "r");
+    fp = fopen("alfabeto_palavras.csv", "r"); //abre arquivo CSV
     if (!fp){
         printf("Ja perdeu!");
         return 0;
     }
-    
+
+INICIO: //tag para o goto
+    erros = acertos = perdeu = posDigitadas = 0;
+    NumerosAleatorios(&rand1, &rand2); 
+
     strcpy(str, EncontraPalavra(fp, rand1, rand2)); //transfere a palavra encontrada para um array
     RemoveBarraN(str); //se for a ultima palavra da linha, remove o \n 
 
-    char copia[35]; //transfere palavra encontrada para um array de copia
+    char copia[strlen(str)+1]; //cria um array de acordo com o tamanho da palavra encontrada
     strcpy(copia, str);
+    TranformaEm__(copia);
 
-    for (i = 0; copia[i] != '\0'; i++){ //transforma o array em _ _ _ _
-        copia[i] = '_';
+
+    int tamLetrasDigitadas = strlen(str) + 5;
+    char letrasDigitadas[tamLetrasDigitadas]; //para guardar todas as letras que o usuário digitou
+    for (i = 0; i < strlen(str) + 5; i++){ //para iniciar letrasDigitadas como array vazio
+        letrasDigitadas[i] = ' ';
     }
 
-    while(erros <= 7){ 
-        if (erros == 7){
-            ExibeForca(str, &erros);
-            sleep(1);
-            printf("Voce perdeu!\n");
-            printf("A palavra era: %s", str);
-            break;
-        }
-
-        do{
-            ExibeForca(copia, &erros);
-
-            if (tentativas > 3  && acertos > 1){
-                op = ChutaPalavra(str);
-            
-                if (op == 1){
-                    break;
-                }else if (op == 0){
-                    printf("ERROU!\n");
-                    erros++;
-                    sleep(1);
-                }
-
-                ExibeForca(copia, &erros);
-            }
-
-            printf("Adivinhe uma letra: ");
-            scanf("%c", &letra);
-            getchar();
-            printf("\n");
-
-            letra = tolower((unsigned char)letra); //transforma a letra em minúscula
-            
-            if (strchr(copia, letra) != NULL){
-                printf("A LETRA JA FOI DIGITADA!!\n");
-                sleep(1);
-            }
-        }while(strchr(copia, letra) != NULL); //se letra já existe no array cópia, entao ja foi digitada
+    while (1){
+        ExibeForca(copia, &erros);
         
-        if (op == 1 || strcmp(str, copia) == 0){
-            ExibeForca(str, &erros);
-            sleep(1);
-            printf("Voce ganhou!\n");
+        if (erros > 5){ //verifica se errou mais que 5 vezes
+            perdeu = 1; //variavel bool
             break;
-        }
-
-        tentativas++;
-        
-        if (!ProcuraLetra(str, letra)){ //retorna 1 quanto tem e 0 quando nao tem
-            erros++;
-        }else{
-            acertos++;
-            ArrumaString(copia, str, letra); //atualiza string apos o usuario acertar letra
         }
 
         if (strcmp(str, copia) == 0){
-            ExibeForca(copia, &erros);
-            printf("Voce ganhou!\n");
+            perdeu = 0;
             break;
+        }
+
+        if (acertos > 3){
+            char op;
+
+            printf("\nVoce deseja chutar a palavra? [S/N]: ");
+            scanf("%c", &op);
+            getchar();
+
+            if (tolower(op) == 's'){
+                ChutaPalavra(str);
+                break;
+            }
+        }
+
+        do{
+            printf("Digite a letra: ");
+            scanf("%c", &letra);
+            getchar();
+        } while (VerificaSeDigitou(letrasDigitadas, letra, &posDigitadas, tamLetrasDigitadas) == 1); //retorna 1 se usuario ja digitou e 0 se nao
+
+
+        if (ProcuraLetra(str, letra) == 1){
+            ArrumaString(copia, str, letra);
+            acertos++;
+        }else{
+            erros++;
         }
     }
     sleep(1);
 
+    if (perdeu == 0){
+        printf("\nVOCE GANHOU!\n");
+    }else{
+        printf("\nVOCE PERDEU!\n");
+        printf("A palavra era: %s\n", str);
+    }
+
     printf("\nDeseja jogar novamente?\n"
            "1-sim 2-nao: ");
     scanf("%d", &op);
+    getchar();
+    puts("");
 
     if (op == 1)
         goto INICIO;
