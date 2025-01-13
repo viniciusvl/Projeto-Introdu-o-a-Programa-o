@@ -25,12 +25,6 @@ void TranformaEm__(char *copia){
     }
 }
 
-void LeLetra(char *letra){
-    printf("Digite a letra: ");
-    scanf("%c", letra);
-    getchar();
-}
-
 void MenuInicial(){ //exibe menu inicial
     system("cls");
     printf("\t-----SEJA BEM VINDO AO JOGO DA FORCA-------\n\n");   
