@@ -2,7 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <time.h> //para gerar numeros aleatorios
-#include <unistd.h> //para congelar a tela em certo momentos
+#include <unistd.h> //para congelar e limpar a tela 
 #include <ctype.h> //converter strings em minusculo
 
 void RemoveBarraN(char *p){
@@ -310,6 +310,7 @@ INICIO: //tag para o goto
     scanf("%d", &op);
     getchar();
     puts("");
+    system("cls");
 
     if (op == 1)
         goto INICIO;
